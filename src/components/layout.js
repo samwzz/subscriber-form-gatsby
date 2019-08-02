@@ -7,24 +7,20 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { useStaticQuery, graphql } from 'gatsby';
+import { Helmet } from 'react-helmet';
 
 import Header from './header';
 import './layout.css';
 
 const Layout = ({ children }) => {
-  const data = useStaticQuery(graphql`
-    query SiteTitleQuery {
-      site {
-        siteMetadata {
-          title
-        }
-      }
-    }
-  `);
-
   return (
     <>
+      <Helmet>
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+        />
+      </Helmet>
       <Header/>
       <main>{children}</main>
     </>

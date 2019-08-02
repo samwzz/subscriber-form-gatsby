@@ -21,6 +21,7 @@ const StyledHeader = styled.header`
 const Header = () => (
   <StyledHeader>
     <img
+      alt="logo"
       src="https://clutchpoints.com/wp-content/uploads/2017/06/CPLogo.png"
     />
   </StyledHeader>

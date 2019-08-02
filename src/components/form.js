@@ -11,16 +11,25 @@ const StyledForm = styled.form`
   flex-direction: column;
   justify-content: space-around;
   align-items: flex-start;
-  height: 50%;
-  width: 50%;
-  padding: 5rem;
+  height: 70%;
+  width: 700px;
+  padding: 3rem;
   background-color: #2F2C2C;
   border-radius: 0.5rem;
   box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+  box-sizing: border-box;
+
+  @media (max-width: 480px) {
+    width: 350px;
+  }
 `;
 
 const StyledFormControl = styled(FormControl)`
-  width: 33%;
+  width: 300px;
+
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 `;
 
 const StyledFilledInput = styled(FilledInput)`
@@ -36,7 +45,7 @@ const StyledFilledInput = styled(FilledInput)`
     border-bottom: 1px solid rgba(255, 255, 255, 0.7);
   }
   &:hover:before {
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid #fff;
   }
   &:after {
     border-bottom: 2px solid rgb(166, 212, 250);
@@ -62,7 +71,10 @@ const Form = () => (
       >
         Full Name
       </StyledInputLabel>
-      <StyledFilledInput id="full-name" />
+      <StyledFilledInput
+        id="full-name"
+        placeholder="John Doe"
+      />
     </StyledFormControl>
     <StyledFormControl
       variant="filled"
@@ -74,7 +86,10 @@ const Form = () => (
       >
         Email Address
       </StyledInputLabel>
-      <StyledFilledInput id="email-address" />
+      <StyledFilledInput
+        id="email-address"
+        placeholder="example@email.com"
+      />
     </StyledFormControl>
   </StyledForm>
 );

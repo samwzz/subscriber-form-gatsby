@@ -24,7 +24,10 @@ const Layout = ({ children }) => {
   `);
 
   return (
-    <main>{children}</main>
+    <>
+      <Header/>
+      <main>{children}</main>
+    </>
   );
 };
 

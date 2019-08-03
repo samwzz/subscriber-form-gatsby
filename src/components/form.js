@@ -14,7 +14,6 @@ import {
 import orange from '@material-ui/core/colors/orange';
 import data from '../data';
 import { formErrors, noErrors } from '../helpers/validators';
-import firebase from '../services/firebase';
 
 const StyledForm = styled.form`
   display: flex;
@@ -177,13 +176,7 @@ const Form = () => {
     const errors = formErrors({ firstName, lastName, email });
     if (noErrors(errors)) {
       setErrors({});
-      try {
-        await firebase.contacts.add(data);
-        setSubmitSuccess(true);
-      } catch (error) {
-        console.error('Error adding document: ', error);
-        setSubmitError(true);
-      }
+      setSubmitSuccess(true);
     } else {
       setErrors(errors);
     }
@@ -293,20 +286,20 @@ const Form = () => {
               ) 
             })}
           </StyledSelect>
-        <Chips>
-          {selectedTeams.map((selected) => {
-            const { alias, name, team_color } = selected;
-            return (
-              <StyledChip
-                key={alias}
-                label={name}
-                chipcolor={team_color}
-                onDelete={handleDelete(selected)}
-                avatar={<Avatar alt={alias} src={require(`../images/nba-logos/${alias}_s.png`)} />}
-              />
-            );
-          })}
-        </Chips>
+          <Chips>
+            {selectedTeams.map((selected) => {
+              const { alias, name, team_color } = selected;
+              return (
+                <StyledChip
+                  key={alias}
+                  label={name}
+                  chipcolor={team_color}
+                  onDelete={handleDelete(selected)}
+                  avatar={<Avatar alt={alias} src={require(`../images/nba-logos/${alias}_s.png`)} />}
+                />
+              );
+            })}
+          </Chips>
         </StyledFormControl>
       </StyledFormFields>
       <SubmitButton

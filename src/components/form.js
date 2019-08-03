@@ -4,22 +4,27 @@ import {
   FormControl,
   InputLabel,
   FilledInput,
+  FormHelperText,
   Select,
   MenuItem,
   Chip,
   Avatar,
+  Button,
 } from '@material-ui/core';
 import orange from '@material-ui/core/colors/orange';
 import data from '../data';
+import { formErrors, noErrors } from '../helpers/validators';
+import { subscribe } from '../api';
 
 const StyledForm = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: flex-start;
-  height: 70%;
+  height: auto;
   width: 700px;
   padding: 3rem;
+  margin-top: 10%;
   background-color: #2F2C2C;
   border-radius: 0.5rem;
   box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
@@ -27,12 +32,14 @@ const StyledForm = styled.form`
 
   @media (max-width: 480px) {
     width: 350px;
+    padding: 1rem;
+    margin-top: 15%;
   }
 `;
 
 const StyledFormFields = styled.div`
   width: 100%;
-  height: 100%;
+  height: 500px;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
@@ -75,10 +82,15 @@ const StyledInputLabel = styled(InputLabel)`
 
 const StyledH1 = styled.h1`
   color: #fff;
+  margin-top: 0;
 `;
 
 const StyledH5 = styled.h5`
   color: rgba(255, 255, 255, 0.7);
+  font-weight: normal;
+  &.error {
+    color: #f44336;
+  }
 `;
 
 const StyledSelect = styled(Select)`
@@ -104,6 +116,15 @@ const StyledChip = styled(Chip)`
   }
 `;
 
+const SubmitButton = styled(Button)`
+  color: #fff;
+  background-color: #C2392C;
+  box-shadow: 0 3px 6px 0 rgba(0,0,0,0.16);
+  &:hover {
+    background-color: #C2392C;
+  }
+`
+
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -116,10 +137,13 @@ const MenuProps = {
   },
 };
 const Form = () => {
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [teams, setTeams] = useState({});
   const [selectedTeams, setSelectedTeams] = useState([]);
+  const [errors, setErrors] = useState({});
+  const [networkError, setNetworkError] = useState(false);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -133,6 +157,27 @@ const Form = () => {
     setSelectedTeams(selectedTeams.filter(team => team.alias !== chipToDelete.alias));
   }
 
+  const handleSubmit = async () => {
+    // let res
+    // try {
+    //   const data = {
+    //     firstName,
+    //     lastName,
+    //     status: 'subscribed',
+    //     statusDate: new Date().toISOString(),
+    //   };
+    //   res = await subscribe(data);
+    // } catch {
+    //   setNetworkError(true);
+    // }
+    const errors = formErrors({ firstName, lastName, email });
+    if (noErrors(errors)) {
+      console.log('noerrors');
+    } else {
+      setErrors(errors);
+    }
+  }
+
   return (
     <StyledForm>
       <div>
@@ -143,24 +188,48 @@ const Form = () => {
       <StyledFormFields>
         <StyledFormControl
           variant="filled"
-          required
+          error={!!errors.firstName}
         >
           <StyledInputLabel
-            htmlFor="full-name"
+            htmlFor="first-name"
             shrink
           >
-            Full Name
+            First Name
           </StyledInputLabel>
           <StyledFilledInput
-            id="full-name"
-            placeholder="John Doe"
-            value={name}
-            onChange={e => setName(e.target.value)}
+            id="first-name"
+            placeholder="John"
+            value={firstName}
+            onChange={e => setFirstName(e.target.value)}
           />
+          <FormHelperText>
+            {errors.firstName}
+          </FormHelperText>
+        </StyledFormControl>
+        <StyledFormControl
+          variant="filled"
+          error={!!errors.lastName}
+        >
+          <StyledInputLabel
+            htmlFor="last-name"
+            shrink
+          >
+            Last Name
+          </StyledInputLabel>
+          <StyledFilledInput
+            id="last-name"
+            placeholder="Doe"
+            value={lastName}
+            onChange={e => setLastName(e.target.value)}
+          />
+          <FormHelperText>
+            {errors.lastName}
+          </FormHelperText>
         </StyledFormControl>
         <StyledFormControl
           variant="filled"
           required
+          error={!!errors.email}
         >
           <StyledInputLabel
             htmlFor="email-address"
@@ -174,6 +243,9 @@ const Form = () => {
             value={email}
             onChange={e => setEmail(e.target.value)}
           />
+          <FormHelperText>
+            {errors.email}
+          </FormHelperText>
         </StyledFormControl>
         <StyledFormControl
           variant="filled"
@@ -211,17 +283,31 @@ const Form = () => {
             })}
           </StyledSelect>
         <Chips>
-          {selectedTeams.map(selected => (
-            <StyledChip
-              key={selected.alias}
-              label={selected.name}
-              chipcolor={selected.team_color}
-              onDelete={handleDelete(selected)}
-            />
-          ))}
+          {selectedTeams.map((selected) => {
+            const { alias, name, team_color } = selected;
+            return (
+              <StyledChip
+                key={alias}
+                label={name}
+                chipcolor={team_color}
+                onDelete={handleDelete(selected)}
+                avatar={<Avatar alt={alias} src={require(`../images/nba-logos/${alias}_s.png`)} />}
+              />
+            );
+          })}
         </Chips>
         </StyledFormControl>
       </StyledFormFields>
+      <SubmitButton
+        variant="contained"
+        size="large"
+        onClick={handleSubmit}
+      >
+        Submit
+      </SubmitButton>
+      {networkError && (
+        <StyledH5 className="error">There was a problem submitting your request.</StyledH5>
+      )}
     </StyledForm>
   );
 };

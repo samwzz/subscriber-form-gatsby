@@ -14,7 +14,7 @@ import {
 import orange from '@material-ui/core/colors/orange';
 import data from '../data';
 import { formErrors, noErrors } from '../helpers/validators';
-import { subscribe } from '../api';
+import firebase from '../services/firebase';
 
 const StyledForm = styled.form`
   display: flex;
@@ -123,6 +123,10 @@ const SubmitButton = styled(Button)`
   &:hover {
     background-color: #C2392C;
   }
+  &.Mui-disabled {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.13);
+  }
 `
 
 const ITEM_HEIGHT = 48;
@@ -143,7 +147,8 @@ const Form = () => {
   const [teams, setTeams] = useState({});
   const [selectedTeams, setSelectedTeams] = useState([]);
   const [errors, setErrors] = useState({});
-  const [networkError, setNetworkError] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   useEffect(() => {
     const fetchTeams = async () => {
@@ -158,21 +163,27 @@ const Form = () => {
   }
 
   const handleSubmit = async () => {
-    // let res
-    // try {
-    //   const data = {
-    //     firstName,
-    //     lastName,
-    //     status: 'subscribed',
-    //     statusDate: new Date().toISOString(),
-    //   };
-    //   res = await subscribe(data);
-    // } catch {
-    //   setNetworkError(true);
-    // }
+    const data = {
+      firstName,
+      lastName,
+      email,
+      tags: [
+        ...selectedTeams.map(selected => selected.name.toLowerCase()),
+        'campaign: story of the day '
+      ],
+      status: 'subscribed',
+      statusDate: new Date().toISOString(),
+    };
     const errors = formErrors({ firstName, lastName, email });
     if (noErrors(errors)) {
-      console.log('noerrors');
+      setErrors({});
+      try {
+        await firebase.contacts.add(data);
+        setSubmitSuccess(true);
+      } catch (error) {
+        console.error('Error adding document: ', error);
+        setSubmitError(true);
+      }
     } else {
       setErrors(errors);
     }
@@ -302,11 +313,15 @@ const Form = () => {
         variant="contained"
         size="large"
         onClick={handleSubmit}
+        disabled={submitSuccess}
       >
         Submit
       </SubmitButton>
-      {networkError && (
+      {submitError && (
         <StyledH5 className="error">There was a problem submitting your request.</StyledH5>
+      )}
+      {submitSuccess && (
+        <StyledH5>Thank you for submitting your request.</StyledH5>
       )}
     </StyledForm>
   );
